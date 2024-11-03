@@ -1,0 +1,122 @@
+import { Button, VerticalBox, HorizontalBox } from "std-widgets.slint";
+
+export component AppWindow inherits Window {
+    in-out property <int> counter: 42;
+    in property <string> song_name: "Song Name";
+    in property <image> song_image: @image-url("./res/song_image.png");
+    in property <image> rw: @image-url("./res/back_button.png");
+    in property <image> pp: @image-url("./res/pause_button.png");
+    in property <image> ff: @image-url("./res/forward_button.png");
+    in property <image> bg: @image-url("./res/background.png");
+
+    callback skip-forward();
+    callback skip-backward();
+    callback play-pause();
+    VerticalBox {
+        padding: 0px;
+        Rectangle {
+            width: 800px;
+            height: 480px;
+            Image {
+                source: root.bg;
+                width: 100%;
+                height: 100%;
+                visible: true;
+            }
+
+            VerticalBox {
+                HorizontalBox {
+                    Rectangle {
+                        clip: true;
+                        drop-shadow-color: #000000;
+                        drop-shadow-offset-x: 0px;
+                        drop-shadow-offset-y: 0px;
+                        drop-shadow-blur: 10px;
+                        border-radius: 10px;
+                        width: 280px;
+                        height: 280px;
+                        Image {
+                            source: root.song_image;
+                            width: 100%;
+                            height: 100%;
+                            visible: true;
+                        }
+                    }
+
+                    Text {
+                        text: root.song_name;
+                        font-size: 24px;
+                        font-weight: 2;
+                        color: #FFFFFF;
+                    }
+                }
+
+                HorizontalBox {
+
+                    Rectangle {
+
+                        width: 100px;
+                        height: 100px;
+
+                        Button {
+                            width: 100%;
+                            height: 100%;
+                            clicked => {
+                                root.skip-backward();
+                            }
+                        }
+
+                        Image {
+                            source: root.rw;
+                            width: 100%;
+                            height: 100%;
+                            visible: true;
+                        }
+                    }
+
+                    Rectangle {
+
+                        width: 100px;
+                        height: 100px;
+
+                        Button {
+                            width: 100%;
+                            height: 100%;
+                            clicked => {
+                                root.play-pause();
+                            }
+                        }
+
+                        Image {
+                            source: root.pp;
+                            width: 100%;
+                            height: 100%;
+                            visible: true;
+                        }
+                    }
+
+                    Rectangle {
+
+                        width: 100px;
+                        height: 100px;
+
+                        Button {
+                            width: 100%;
+                            height: 100%;
+                            clicked => {
+                                root.skip-forward();
+                            }
+                        }
+
+                        Image {
+                            source: root.ff;
+                            width: 100%;
+                            height: 100%;
+                            visible: true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

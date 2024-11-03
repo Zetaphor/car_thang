@@ -1,8 +1,9 @@
-
 use chrono::TimeDelta;
-use rspotify::{model::{Id, PlayableItem, TrackId}, prelude::{BaseClient, OAuthClient}, AuthCodeSpotify, ClientError};
-
-
+use rspotify::{
+    model::{Id, PlayableItem, TrackId},
+    prelude::{BaseClient, OAuthClient},
+    AuthCodeSpotify, ClientError,
+};
 
 pub struct State {
     pub is_playing: bool,
@@ -11,8 +12,10 @@ pub struct State {
     pub device: Option<String>,
 }
 
-pub async fn change_playback_state(spotify: &AuthCodeSpotify, state: &mut State) -> Result<(), ClientError> {
-
+pub async fn change_playback_state(
+    spotify: &AuthCodeSpotify,
+    state: &mut State,
+) -> Result<(), ClientError> {
     let device = state.device.clone();
 
     if state.is_playing {
@@ -29,12 +32,18 @@ pub async fn skip_forward(spotify: &AuthCodeSpotify, state: &mut State) -> Resul
     spotify.next_track(device.as_deref()).await
 }
 
-pub async fn skip_backward(spotify: &AuthCodeSpotify, state: &mut State) -> Result<(), ClientError> {
+pub async fn skip_backward(
+    spotify: &AuthCodeSpotify,
+    state: &mut State,
+) -> Result<(), ClientError> {
     let device = state.device.clone();
     spotify.previous_track(device.as_deref()).await
 }
 
-pub async fn get_name_of_current_song(spotify: &AuthCodeSpotify, state: &mut State) -> Result<String, ClientError> {
+pub async fn get_name_of_current_song(
+    spotify: &AuthCodeSpotify,
+    state: &mut State,
+) -> Result<String, ClientError> {
     let binding = state.item.clone().unwrap();
     let binding = binding.id().unwrap();
     let track_id = TrackId::from_id(binding.id()).unwrap();
@@ -42,3 +51,14 @@ pub async fn get_name_of_current_song(spotify: &AuthCodeSpotify, state: &mut Sta
     Ok(track.name)
 }
 
+pub async fn get_image_url_of_current_song(
+    spotify: &AuthCodeSpotify,
+    state: &mut State,
+) -> Result<String, ClientError> {
+    let binding = state.item.clone().unwrap();
+    let binding = binding.id().unwrap();
+    let track_id = TrackId::from_id(binding.id()).unwrap();
+    let track = spotify.track(track_id, None).await.unwrap();
+    let img = track.album.images[0].url.clone();
+    Ok(img)
+}
