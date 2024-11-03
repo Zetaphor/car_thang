@@ -1,7 +1,7 @@
 use std::time::Instant;
 
 use rspotify::{
-    model::{Id, TrackId},
+    model::{user, Id, TrackId},
     prelude::{BaseClient, OAuthClient},
     scopes, AuthCodeSpotify, Config, Credentials, OAuth,
 };
@@ -94,13 +94,18 @@ pub async fn get_state_from_spotify(spotify: &AuthCodeSpotify) -> State {
         last_update,
         percentage,
         seek_time: -1.0,
+        has_connection: true,
     }
 }
 
 pub async fn update_state_item(spotify: &AuthCodeSpotify, state: &mut State) {
     let current = spotify.current_playing(None, None::<Vec<_>>).await;
 
-    let use_current = current.unwrap().unwrap().clone();
+    let Ok(Some(use_current)) = current else {
+        state.has_connection = false;
+        return;
+    };
+    state.has_connection = true;
 
     state.is_playing = use_current.is_playing;
     state.progress_ms = use_current.progress.unwrap();

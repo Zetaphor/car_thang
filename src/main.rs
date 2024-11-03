@@ -105,7 +105,7 @@ async fn main() {
             use_tx1
                 .send("Deep Update".into())
                 .await
-                .expect("Couldn't Shuffle song");
+                .expect("Couldn't Refresh song");
         });
     });
 
@@ -177,59 +177,64 @@ async fn main() {
                         },
 
                         "Update Progress" => {
-                            let ui2 = ui_handle.clone();
-                            guess_current_progress(&spotify, &mut state).await;
+                            if !state.has_connection {
 
-                            if state.percentage >= 1.0 {
-                                update_state_item(&spotify, &mut state).await;
-                                let (mut name, mut artist, mut album) = get_name_of_current_song(&spotify, &mut state).await.unwrap();
-                                if name.len() > 19  {
-                                    name = name.chars().take(19).collect();
-                                    name.push_str("...");
-                                }
-                                if artist.len() > 30  {
-                                    artist = artist.chars().take(30).collect();
-                                    artist.push_str("...");
-                                }
-                                if album.len() > 30  {
-                                    album = album.chars().take(30).collect();
-                                    album.push_str("...");
-                                }
-                                let img = get_image_url_of_current_song(&spotify, &mut state).await.unwrap();
-                                println!("Got new song: {:?}: {:?}", name, img);
-                                let image_bytes = reqwest::get(&img).await.unwrap().bytes().await.unwrap();
-
-                                slint::invoke_from_event_loop(move || {
-                                    let img = image::load_from_memory(&image_bytes).unwrap().into_rgba8();
-                                    let color = color_thief::get_palette(img.as_bytes(), color_thief::ColorFormat::Rgba, 5, 2).unwrap()[0];
-                                    let use_color = slint::Color::from_rgb_u8(color.r, color.g, color.b);
-                                    let whiten = (color.r as f32 * color.r as f32 + color.g as f32 * color.g as f32 + color.b as f32 * color.b as f32).sqrt() <= 120.0;
-                                    let shared_buf = SharedPixelBuffer::<Rgba8Pixel>::clone_from_slice(
-                                        img.as_raw(),
-                                        img.width(),
-                                        img.height(),
-                                    );
-                                    let image = Image::from_rgba8(shared_buf);
-
-                                    let ui = ui2.unwrap();
-                                    ui.set_song_name(SharedString::from(name));
-                                    ui.set_artist_name(SharedString::from(artist));
-                                    ui.set_album_name(SharedString::from(album));
-                                    ui.set_song_image(image);
-                                    ui.set_background_color(use_color);
-                                    ui.set_use_white_text(whiten);
-                                    ui.set_paused(state.is_playing);
-                                    ui.set_shuffled(state.shuffle);
-                                    ui.set_liked(state.liked);
-                                    ui.set_time(state.percentage);
-                                }).unwrap();
-
-                                (queue,  loc_in_queue) = get_buffer_and_location(&spotify).await;
                             } else {
-                                slint::invoke_from_event_loop(move || {
-                                    let ui = ui2.unwrap();
-                                    ui.set_time(state.percentage);
-                                 }).unwrap();
+                                let ui2 = ui_handle.clone();
+                                guess_current_progress(&spotify, &mut state).await;
+
+                                if state.percentage >= 1.0 {
+                                    update_state_item(&spotify, &mut state).await;
+                                    let (mut name, mut artist, mut album) = get_name_of_current_song(&spotify, &mut state).await.unwrap();
+                                    if name.len() > 19  {
+                                        name = name.chars().take(19).collect();
+                                        name.push_str("...");
+                                    }
+                                    if artist.len() > 30  {
+                                        artist = artist.chars().take(30).collect();
+                                        artist.push_str("...");
+                                    }
+                                    if album.len() > 30  {
+                                        album = album.chars().take(30).collect();
+                                        album.push_str("...");
+                                    }
+                                    let img = get_image_url_of_current_song(&spotify, &mut state).await.unwrap();
+                                    println!("Got new song: {:?}: {:?}", name, img);
+                                    let image_bytes = reqwest::get(&img).await.unwrap().bytes().await.unwrap();
+
+                                    slint::invoke_from_event_loop(move || {
+                                        let img = image::load_from_memory(&image_bytes).unwrap().into_rgba8();
+                                        let color = color_thief::get_palette(img.as_bytes(), color_thief::ColorFormat::Rgba, 5, 2).unwrap()[0];
+                                        let use_color = slint::Color::from_rgb_u8(color.r, color.g, color.b);
+                                        let whiten = (color.r as f32 * color.r as f32 + color.g as f32 * color.g as f32 + color.b as f32 * color.b as f32).sqrt() <= 120.0;
+                                        let shared_buf = SharedPixelBuffer::<Rgba8Pixel>::clone_from_slice(
+                                            img.as_raw(),
+                                            img.width(),
+                                            img.height(),
+                                        );
+                                        let image = Image::from_rgba8(shared_buf);
+
+                                        let ui = ui2.unwrap();
+                                        ui.set_song_name(SharedString::from(name));
+                                        ui.set_artist_name(SharedString::from(artist));
+                                        ui.set_album_name(SharedString::from(album));
+                                        ui.set_song_image(image);
+                                        ui.set_background_color(use_color);
+                                        ui.set_use_white_text(whiten);
+                                        ui.set_paused(state.is_playing);
+                                        ui.set_shuffled(state.shuffle);
+                                        ui.set_liked(state.liked);
+                                        ui.set_time(state.percentage);
+                                        ui.set_paused(state.is_playing);
+                                    }).unwrap();
+
+                                    (queue,  loc_in_queue) = get_buffer_and_location(&spotify).await;
+                                } else {
+                                    slint::invoke_from_event_loop(move || {
+                                        let ui = ui2.unwrap();
+                                        ui.set_time(state.percentage);
+                                    }).unwrap();
+                                }
                             }
                         },
 
@@ -319,6 +324,7 @@ async fn main() {
                                 ui.set_shuffled(state.shuffle);
                                 ui.set_liked(state.liked);
                                 ui.set_time(state.percentage);
+                                ui.set_paused(state.is_playing);
                             }).unwrap();
 
                             (queue,  loc_in_queue) = get_buffer_and_location(&spotify).await;

@@ -19,6 +19,7 @@ pub struct State {
     pub last_update: Instant,
     pub percentage: f32,
     pub seek_time: f32,
+    pub has_connection: bool,
 }
 
 pub async fn change_playback_state(
