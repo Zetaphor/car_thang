@@ -1,2 +1,6 @@
 /target
 .*
+
+# nix
+nixos-superbird/result
+nixos-superbird/resources/DOOM.WAD

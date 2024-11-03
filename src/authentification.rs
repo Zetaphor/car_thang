@@ -1,7 +1,7 @@
 use std::time::Instant;
 
 use rspotify::{
-    model::{user, Id, TrackId},
+    model::{Id, TrackId},
     prelude::{BaseClient, OAuthClient},
     scopes, AuthCodeSpotify, Config, Credentials, OAuth,
 };
@@ -30,11 +30,17 @@ pub async fn setup_spotify() -> AuthCodeSpotify {
     ))
     .unwrap();
 
+    let config_dir = dirs::config_dir().expect("you don't have a config dir wtf");
+    let cache_path = config_dir.join("car_thang");
+
+    let _ = std::fs::create_dir_all(&cache_path);
+
     let spotify = AuthCodeSpotify::with_config(
         creds,
         oauth,
         Config {
             token_cached: true,
+            cache_path: cache_path.join("hawk_creds.json"),
             ..Default::default()
         },
     );
