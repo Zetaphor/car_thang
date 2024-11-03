@@ -93,6 +93,7 @@ pub async fn get_state_from_spotify(spotify: &AuthCodeSpotify) -> State {
         total_time: duration,
         last_update,
         percentage,
+        seek_time: -1.0,
     }
 }
 

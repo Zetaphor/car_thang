@@ -21,6 +21,8 @@ export component AppWindow inherits Window {
     in property <image> shuffle_off: @image-url("./res/shuffle_off.svg");
     in property <image> shuffle_on: @image-url("./res/shuffle_on.svg");
 
+    out property <length> x-location: ta.mouse-x;
+
     in property <float> time: 0;
 
     callback skip-forward();
@@ -28,6 +30,8 @@ export component AppWindow inherits Window {
     callback play-pause();
     callback like();
     callback shuffle();
+    callback refresh();
+    callback seek();
 
     VerticalBox {
         padding: 0px;
@@ -59,6 +63,15 @@ export component AppWindow inherits Window {
                         border-radius: 10px;
                         width: 280px;
                         height: 280px;
+                        Button {
+                            opacity: 0;
+                            width: 100%;
+                            height: 100%;
+                            clicked => {
+                                root.refresh();
+                            }
+                        }
+
                         Image {
                             source: root.song_image;
                             width: 100%;
@@ -104,6 +117,14 @@ export component AppWindow inherits Window {
                         width: 100%;
                         height: 5px;
                         padding: 0px;
+
+                        ta := TouchArea {
+                            width: 100%;
+                            height: 5px;
+                            clicked => {
+                                root.seek();
+                            }
+                        }
 
                         bar := Rectangle {
                             x: 0px;

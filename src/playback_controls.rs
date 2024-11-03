@@ -1,4 +1,4 @@
-use std::time::Instant;
+use std::time::{Duration, Instant};
 
 use chrono::TimeDelta;
 use rspotify::{
@@ -18,6 +18,7 @@ pub struct State {
     pub total_time: TimeDelta,
     pub last_update: Instant,
     pub percentage: f32,
+    pub seek_time: f32,
 }
 
 pub async fn change_playback_state(
@@ -34,6 +35,16 @@ pub async fn change_playback_state(
         state.last_update = Instant::now();
         spotify.resume_playback(device.as_deref(), None).await
     }
+}
+
+pub async fn seek_in_track(spotify: &AuthCodeSpotify, state: &mut State) {
+    let new_time = (state.seek_time / 800.0 * state.total_time.num_milliseconds() as f32) as u64;
+    let time = TimeDelta::from_std(Duration::from_millis(new_time)).unwrap();
+    let device = state.device.clone();
+    let _ = spotify.seek_track(time, device.as_deref()).await;
+    state.last_update = Instant::now();
+    state.time_left = state.total_time - time;
+    state.percentage = new_time as f32;
 }
 
 pub async fn update_time(spotify: &AuthCodeSpotify, state: &mut State) {
