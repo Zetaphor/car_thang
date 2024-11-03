@@ -1,6 +1,15 @@
-use rspotify::{prelude::OAuthClient, scopes, AuthCodeSpotify, Config, Credentials, OAuth};
+use std::time::Instant;
 
-use crate::State;
+use rspotify::{
+    model::{Id, TrackId},
+    prelude::{BaseClient, OAuthClient},
+    scopes, AuthCodeSpotify, Config, Credentials, OAuth,
+};
+
+use crate::{
+    playback_controls::State,
+    playback_controls::{get_liked_state, get_shuffle_state, update_time},
+};
 
 pub async fn setup_spotify() -> AuthCodeSpotify {
     let creds = Credentials::from_env().unwrap();
@@ -53,11 +62,37 @@ pub async fn get_state_from_spotify(spotify: &AuthCodeSpotify) -> State {
         .id
         .clone();
 
+    let shuffle = spotify
+        .current_playback(None, None::<Vec<_>>)
+        .await
+        .unwrap()
+        .unwrap()
+        .shuffle_state;
+    let item_id = item.as_ref().unwrap().id().unwrap().id().to_string();
+    let track_id = TrackId::from_id(&item_id).unwrap();
+    let track_id2 = track_id.clone();
+    let liked = spotify
+        .current_user_saved_tracks_contains([track_id])
+        .await
+        .unwrap()[0];
+    let track = spotify.track(track_id2, None).await.unwrap();
+    let duration = track.duration;
+    let time_left = duration - use_current.progress.unwrap();
+    let last_update = Instant::now();
+
+    let percentage = (duration.num_milliseconds() - time_left.num_milliseconds()) as f32
+        / duration.num_milliseconds() as f32;
     State {
         is_playing,
         progress_ms,
         item,
         device,
+        shuffle,
+        liked,
+        time_left,
+        total_time: duration,
+        last_update,
+        percentage,
     }
 }
 
@@ -69,4 +104,7 @@ pub async fn update_state_item(spotify: &AuthCodeSpotify, state: &mut State) {
     state.is_playing = use_current.is_playing;
     state.progress_ms = use_current.progress.unwrap();
     state.item = use_current.item;
+    get_shuffle_state(spotify, state).await;
+    get_liked_state(spotify, state).await;
+    update_time(spotify, state).await;
 }

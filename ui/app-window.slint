@@ -1,31 +1,55 @@
-import { Button, VerticalBox, HorizontalBox } from "std-widgets.slint";
+import { Button, VerticalBox, HorizontalBox, Slider, ProgressIndicator } from "std-widgets.slint";
 
 export component AppWindow inherits Window {
     in-out property <int> counter: 42;
     in property <string> song_name: "Song Name";
+    in property <string> artist_name: "Artist Name";
+    in property <string> album_name: "Album Name";
+    in property <color> background_color: #CC0000FF;
+    in property <bool> use_white_text: true;
+    in property <bool> paused: true;
+    in property <bool> shuffled: false;
+    in property <bool> liked: false;
     in property <image> song_image: @image-url("./res/song_image.png");
-    in property <image> rw: @image-url("./res/back_button.png");
-    in property <image> pp: @image-url("./res/pause_button.png");
-    in property <image> ff: @image-url("./res/forward_button.png");
+    in property <image> rw: @image-url("./res/back_button.svg");
+    in property <image> pause: @image-url("./res/pause_button.svg");
+    in property <image> play: @image-url("./res/play_button.svg");
+    in property <image> ff: @image-url("./res/forward_button.svg");
     in property <image> bg: @image-url("./res/background.png");
+    in property <image> heart_off: @image-url("./res/heart_off.svg");
+    in property <image> heart_on: @image-url("./res/heart_on.svg");
+    in property <image> shuffle_off: @image-url("./res/shuffle_off.svg");
+    in property <image> shuffle_on: @image-url("./res/shuffle_on.svg");
+
+    in property <float> time: 0;
 
     callback skip-forward();
     callback skip-backward();
     callback play-pause();
+    callback like();
+    callback shuffle();
+
     VerticalBox {
         padding: 0px;
         Rectangle {
             width: 800px;
             height: 480px;
-            Image {
-                source: root.bg;
-                width: 100%;
-                height: 100%;
-                visible: true;
-            }
+            // Image {
+            //     source: root.bg;
+            //     width: 100%;
+            //     height: 100%;
+            //     visible: true;
+            // }
+
+            background: root.background_color.darker(0.05);
 
             VerticalBox {
+                padding: 20px;
+                padding-left: 0px;
+                padding-right: 0px;
                 HorizontalBox {
+                    padding-left: 20px;
+                    padding-right: 20px;
                     Rectangle {
                         clip: true;
                         drop-shadow-color: #000000;
@@ -43,76 +67,167 @@ export component AppWindow inherits Window {
                         }
                     }
 
-                    Text {
-                        text: root.song_name;
-                        font-size: 24px;
-                        font-weight: 2;
-                        color: #FFFFFF;
+                    VerticalBox {
+                        alignment: center;
+                        Text {
+                            text: root.song_name;
+                            font-size: 40px;
+                            font-weight: 12;
+                            color: root.use_white_text ? #FFFFFFC8 : root.background_color.brighter(0.9);
+                        }
+
+                        Text {
+                            text: root.artist_name;
+                            font-size: 20px;
+                            font-weight: 2;
+                            color: root.use_white_text ? #CCCCCCC8 : root.background_color.brighter(0.8);
+                        }
+
+                        Text {
+                            text: root.album_name;
+                            font-size: 20px;
+                            font-weight: 2;
+                            color: root.use_white_text ? #EEEEEEC8 : root.background_color.brighter(0.85);
+                        }
                     }
                 }
 
-                HorizontalBox {
+                Rectangle {
+                    background: root.background_color.darker(0.45);
+                    width: 100%;
+                    height: 100%;
+                    padding: 0px;
 
                     Rectangle {
+                        y: 0px;
+                        background: root.background_color.darker(0.8);
+                        width: 100%;
+                        height: 5px;
+                        padding: 0px;
 
-                        width: 100px;
-                        height: 100px;
-
-                        Button {
-                            width: 100%;
-                            height: 100%;
-                            clicked => {
-                                root.skip-backward();
-                            }
-                        }
-
-                        Image {
-                            source: root.rw;
-                            width: 100%;
-                            height: 100%;
-                            visible: true;
+                        bar := Rectangle {
+                            x: 0px;
+                            background: #FFFFFF;
+                            width: root.time * 800px;
+                            height: 5px;
+                            padding: 0px;
+                            animate width { duration: 100ms; }
                         }
                     }
 
-                    Rectangle {
+                    HorizontalBox {
+                        padding-top: 25px;
+                        alignment: center;
 
-                        width: 100px;
-                        height: 100px;
+                        width: 100%;
+                        spacing: 50px;
 
-                        Button {
-                            width: 100%;
-                            height: 100%;
-                            clicked => {
-                                root.play-pause();
+                        Rectangle {
+
+                            width: 100px;
+                            height: 100px;
+                            Button {
+                                opacity: 0;
+                                width: 100%;
+                                height: 100%;
+                                clicked => {
+                                    root.shuffle();
+                                }
+                            }
+
+                            Image {
+                                source: (root.shuffled) ? root.shuffle_on : root.shuffle_off;
+                                width: 100%;
+                                height: 100%;
+                                visible: true;
                             }
                         }
 
-                        Image {
-                            source: root.pp;
-                            width: 100%;
-                            height: 100%;
-                            visible: true;
-                        }
-                    }
+                        Rectangle {
 
-                    Rectangle {
+                            width: 100px;
+                            height: 100px;
 
-                        width: 100px;
-                        height: 100px;
+                            Button {
+                                opacity: 0;
+                                width: 100%;
+                                height: 100%;
+                                clicked => {
+                                    root.skip-backward();
+                                }
+                            }
 
-                        Button {
-                            width: 100%;
-                            height: 100%;
-                            clicked => {
-                                root.skip-forward();
+                            Image {
+                                source: root.rw;
+                                width: 100%;
+                                height: 100%;
+                                visible: true;
                             }
                         }
 
-                        Image {
-                            source: root.ff;
-                            width: 100%;
-                            height: 100%;
-                            visible: true;
+                        Rectangle {
+
+                            width: 100px;
+                            height: 100px;
+
+                            Button {
+                                opacity: 0;
+                                width: 100%;
+                                height: 100%;
+                                clicked => {
+                                    root.play-pause();
+                                }
+                            }
+
+                            Image {
+                                source: (root.paused) ? root.pause : root.play;
+                                width: 100%;
+                                height: 100%;
+                                visible: true;
+                            }
+                        }
+
+                        Rectangle {
+
+                            width: 100px;
+                            height: 100px;
+
+                            Button {
+                                opacity: 0;
+                                width: 100%;
+                                height: 100%;
+                                clicked => {
+                                    root.skip-forward();
+                                }
+                            }
+
+                            Image {
+                                source: root.ff;
+                                width: 100%;
+                                height: 100%;
+                                visible: true;
+                            }
+                        }
+
+                        Rectangle {
+
+                            width: 100px;
+                            height: 100px;
+                            Button {
+                                opacity: 0;
+                                width: 100%;
+                                height: 100%;
+                                clicked => {
+                                    root.like();
+                                }
+                            }
+
+                            Image {
+                                source: (root.liked) ? root.heart_on : root.heart_off;
+                                width: 100%;
+                                height: 100%;
+                                visible: true;
+                            }
                         }
                     }
                 }
