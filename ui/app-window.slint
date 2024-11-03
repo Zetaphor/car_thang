@@ -10,7 +10,7 @@ export component AppWindow inherits Window {
     in property <bool> paused: true;
     in property <bool> shuffled: false;
     in property <bool> liked: false;
-    in property <bool> debug_icons: true;
+    in property <bool> debug_icons: false;
     in property <image> song_image: @image-url("./res/song_image.png");
     in property <image> rw: (debug_icons) ? @image-url("./res/back_button.png") : @image-url("./res/back_button.svg");
     in property <image> pause: (debug_icons) ? @image-url("./res/pause_button.png") : @image-url("./res/pause_button.svg");
