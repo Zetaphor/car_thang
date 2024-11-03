@@ -31,6 +31,7 @@ async fn main() {
     let ui = AppWindow::new().unwrap();
     let ui_handle = ui.as_weak();
     let ui_handle_2 = ui_handle.clone();
+    let ui_handle_3 = ui_handle.clone();
 
     let (tx1, mut rx1) = mpsc::channel::<String>(32);
 
@@ -56,6 +57,12 @@ async fn main() {
         });
 
         tokio::task::spawn(async move {});
+    });
+
+    ui.on_change_debug(move || {
+        let ui2 = ui_handle_3.clone();
+        let ui3 = ui2.unwrap();
+        ui3.set_debug_icons(!ui3.get_debug_icons());
     });
 
     let update_tx = tx1.clone();
