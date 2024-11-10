@@ -250,6 +250,11 @@ for o in $(cat /proc/cmdline); do
   superbird.postflash)
     postflash
     ;;
+  superbird.install)
+    partition
+    network_routes &
+    init_net
+    ;;
   esac
 done
 

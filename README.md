@@ -2,11 +2,20 @@
 
 Hawk Tuah, revive that Car Thing.
 
-This project was started for HackNC 2024. There is a lot more that needs to happen in order to make this project usable by a wider audience, as the installation process is quite involved at the moment.
+Car Thang is the first fully tether-free mod for the Spotify Car Thing. It does not require a computer to operate, and can be used just off your phone's Bluetooth just like the original. It can also join your phone's hotspot for internet-connected functionality.
+
+This project was started for HackNC 2024. There is a lot more that needs to happen in order to make this project usable by a wider audience, as the installation process is quite involved at the moment. [View the HackNC Submission](https://devpost.com/software/car-thang)
+
+If you would like to support the development of Car Thang, please consider sending us any old Car Things you may have lying around.
+
+## Gallery (alpha version)
+
+<img src="./img/ui.png" width="400" alt="picture of the Car Thang UI" />
+<img src="./img/on-thang.png" width="400" alt="picture of the Car Thang app running on the Car Thing" />
 
 ## Installation
 
-Once this project is finished we plan to make a one-click install script that will flash Linux to your Car Thing and get you all set up.
+Once this project is finished we will make a one-click install script that will flash Linux to your Car Thing and get you all set up.
 
 In the meantime, if you are great at Linux, check out [alexcaoys](https://github.com/alexcaoys)'s [notes-superbird](https://github.com/alexcaoys/notes-superbird). You will probably be able to figure something out from there.
 
