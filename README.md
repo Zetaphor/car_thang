@@ -4,6 +4,54 @@ Hawk Tuah, revive that Car Thing.
 
 This project was started for HackNC 2024. There is a lot more that needs to happen in order to make this project usable by a wider audience, as the installation process is quite involved at the moment.
 
+## Installation
+
+Once this project is finished we plan to make a one-click install script that will flash Linux to your Car Thing and get you all set up.
+
+In the meantime, if you are great at Linux, check out [alexcaoys](https://github.com/alexcaoys)'s [notes-superbird](https://github.com/alexcaoys/notes-superbird). You will probably be able to figure something out from there.
+
+## Building
+
+Requirements:
+
+- Rust (installer)
+- Nix (OS && app)
+- Aarch64-linux system or QEMU
+
+Building this project requires either an aarch64-linux machine or QEMU on Linux. You can check if you have QEMU binfmt set up by running `ls /proc/sys/fs/binfmt_misc/` and ensuring that `qemu-aarch64` is present.
+
+Add this line to your `/etc/nix/nix.conf` and restart the Nix daemon:
+
+```none
+extra-platforms = aarch64-linux
+```
+
+We have only tested builds on Linux at the moment, but plan to add MacOS and possibly Windows (via WSL2) support.
+
+## Project Structure
+
+```sh
+car_thang/
+├── app
+│   └── # the new spotify app, written in rust
+├── install
+│   └── # the installation application, written in terrible python
+└── nixos
+    └── # all of the nix files to build the custom nixos image
+```
+
+## Bluetooth
+
+This app will soon support both Bluetooth media and Bluetooth PAN to emulate the exact functionality of the original Car Thing.
+
+Just leaving this here for safekeeping for now:
+
+`dbus-send --system --type=method_call --dest=org.bluez /org/bluez/hci0/dev_<MAC_ADDRESS> org.bluez.Network1.Connect string:'nap'`
+
+## Notes
+
+To make the install easier, we committed the SSH keys that the devices will use. This is not a problem as the only way to connect to this device is via USB.
+
 ## Prior Art
 
 We would like to give a massive shoutout to [alexcaoys](https://github.com/alexcaoys). Their work on the [linux-superbird-6.6.y](https://github.com/alexcaoys/linux-superbird-6.6.y) kernel made this entire project possible.
