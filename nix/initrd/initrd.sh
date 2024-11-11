@@ -239,21 +239,23 @@ for o in $(cat /proc/cmdline); do
     boot_part_start=4MiB
     boot_part_end=128MiB
     ;;
+  superbird.exportlog)
+    export_log &
+    ;;
   superbird.net)
     network_routes &
-    # export_log &
     init_net
     ;;
   superbird.partition)
     partition
     ;;
-  superbird.postflash)
-    postflash
-    ;;
   superbird.install)
     partition
     network_routes &
     init_net
+    ;;
+  superbird.postflash)
+    postflash
     ;;
   esac
 done

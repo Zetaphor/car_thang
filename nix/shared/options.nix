@@ -9,6 +9,16 @@ with lib;
       type = types.bool;
       description = "whether doom is enabled :)";
     };
+
+    firefoxEnabled = mkOption {
+      type = types.bool;
+      description = "whether firefox is enabled";
+    };
+
+    chromiumEnabled = mkOption {
+      type = types.bool;
+      description = "whether chromium is enabled";
+    };
   };
 
   # config.age.secrets.spotify_env = {

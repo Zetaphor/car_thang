@@ -13,6 +13,21 @@ If you would like to support the development of Car Thang, please consider sendi
 <img src="./img/ui.png" width="400" alt="picture of the Car Thang UI" />
 <img src="./img/on-thang.png" width="400" alt="picture of the Car Thang app running on the Car Thing" />
 
+## Features
+
+OS:
+
+- [x] Easy install script
+- [x] Full Linux distribution
+- [x] Bluetooth tethering for internet
+
+App:
+
+- [] Control Bluetooth media without internet
+- [] Spotify integration with internet
+
+More features coming soon!
+
 ## Installation
 
 Once this project is finished we will make a one-click install script that will flash Linux to your Car Thing and get you all set up.
@@ -23,9 +38,9 @@ In the meantime, if you are great at Linux, check out [alexcaoys](https://github
 
 Requirements:
 
-- Rust (installer)
-- Nix (OS && app)
-- Aarch64-linux system or QEMU
+- Rust (app)
+- Nix (OS)
+- Aarch64-linux system or QEMU (OS)
 
 Building this project requires either an aarch64-linux machine or QEMU on Linux. You can check if you have QEMU binfmt set up by running `ls /proc/sys/fs/binfmt_misc/` and ensuring that `qemu-aarch64` is present.
 
@@ -45,7 +60,7 @@ car_thang/
 │   └── # the new spotify app, written in rust
 ├── install
 │   └── # the installation application, written in terrible python
-└── nixos
+└── nix
     └── # all of the nix files to build the custom nixos image
 ```
 

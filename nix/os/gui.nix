@@ -4,11 +4,9 @@
   ...
 }:
 let
-  doom =
-    if config.vars.doomEnabled == true then
-      "${pkgs.doomretro}/bin/doomretro -iwad /etc/games/DOOM.WAD"
-    else
-      "";
+  doom = "${pkgs.doomretro}/bin/doomretro -iwad /etc/games/DOOM.WAD";
+  firefox = "${pkgs.firefox}/bin/firefox";
+  chromium = "${pkgs.ungoogled-chromium}/bin/chromium";
 
   car_thang_der = (
     pkgs.callPackage ../../app/thang.nix { envFile = config.age.secrets.spotify_env.path; }
@@ -19,7 +17,16 @@ let
     #!/usr/bin/env bash
     wlr-randr --output DSI-1 --transform 270
 
-    exec ${if config.vars.doomEnabled == true then doom else car_thang}
+    exec ${
+      if config.vars.doomEnabled == true then
+        doom
+      else if config.vars.firefoxEnabled == true then
+        firefox
+      else if config.vars.chromiumEnabled == true then
+        chromium
+      else
+        car_thang
+    }
   ''}/bin/start-cage-app";
 in
 {

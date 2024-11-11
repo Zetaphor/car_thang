@@ -2,6 +2,8 @@
 let
   vars = {
     doomEnabled = true;
+    firefoxEnabled = false;
+    chromiumEnabled = false;
   };
 in
 {

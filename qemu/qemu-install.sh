@@ -7,7 +7,7 @@ if [ ! -f "$root"/qemu/emmc.img ]; then
 fi
 
 if [ ! -f "$root"/qemu/kernel ]; then
-  pushd nixos || exit 1
+  pushd nix || exit 1
 
   nix build '.#nixosConfigurations.qemu-initrd.config.system.build.toplevel' --show-trace -j"$(nproc)"
   cp result/kernel "$root"/qemu
@@ -16,7 +16,7 @@ if [ ! -f "$root"/qemu/kernel ]; then
 fi
 
 if [ ! -f "$root"/qemu/btrfs.img ]; then
-  pushd nixos || exit 1
+  pushd nix || exit 1
 
   nix build '.#nixosConfigurations.qemu.config.system.build.btrfs' --show-trace -j"$(nproc)"
   cp result "$root"/qemu/btrfs.img
@@ -24,8 +24,8 @@ if [ ! -f "$root"/qemu/btrfs.img ]; then
   popd || exit 1
 fi
 
-if [ ! -f "$root"/nixos/result/initrd.img ]; then
-  pushd nixos || exit 1
+if [ ! -f "$root"/nix/result/initrd.img ]; then
+  pushd nix || exit 1
 
   nix build '.#nixosConfigurations.qemu-initrd.config.system.build.initfs' --show-trace -j"$(nproc)"
 
@@ -37,7 +37,7 @@ sudo qemu-system-aarch64 \
   -serial stdio -device VGA \
   -kernel "$root"/qemu/kernel \
   -append "rdinit=/superbird/init superbird.qemu superbird.partition" \
-  -initrd "$root"/nixos/result/initrd.img \
+  -initrd "$root"/nix/result/initrd.img \
   -drive file="$root"/qemu/emmc.img,if=virtio \
   -drive file="$root"/qemu/btrfs.img,if=virtio,format=raw \
   -accel tcg

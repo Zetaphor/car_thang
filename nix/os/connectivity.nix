@@ -17,9 +17,9 @@
       "8.8.8.8"
     ];
 
-    interfaces.bnep0 = {
-      useDHCP = true;
-    };
+    # interfaces.bnep0 = {
+    #   useDHCP = true;
+    # };
 
     firewall.enable = lib.mkForce false;
   };
@@ -35,11 +35,15 @@
   };
 
   hardware.firmware = [
-    (pkgs.runCommandNoCC "firmware-bluetooth-brcm" { } ''
-      mkdir -p $out/lib/firmware/brcm
-      cp ${../resources/firmware/brcm/BCM.hcd} $out/lib/firmware/brcm/BCM.hcd
-      cp ${../resources/firmware/brcm/BCM20703A2.hcd} $out/lib/firmware/brcm/BCM20703A2.hcd
-    '')
+    (pkgs.stdenv.mkDerivation {
+      name = "broadcom-superbird-bluetooth";
+      src = [ ../resources/firmware/brcm ];
+      phases = [ "installPhase" ];
+      installPhase = ''
+        mkdir -p $out/lib/firmware/brcm
+        cp $src/* $out/lib/firmware/brcm/
+      '';
+    })
   ];
 
   services.openssh = {

@@ -1,9 +1,9 @@
 /target
-.*
+/tmp
 
 # nix
-/nixos/result
-/nixos/resources/DOOM.WAD
+/nix/result
+/nix/resources/DOOM.WAD
 
 # init
 /initrd
@@ -12,3 +12,8 @@
 /qemu/emmc.img
 /qemu/kernel
 /qemu/btrfs.img
+
+# install
+/install/linux
+/install/.venv
+/install/__pycache__
