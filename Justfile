@@ -10,6 +10,7 @@ initrd-build:
 
 nixos-build-fs:
   cd nix && nix build '.#nixosConfigurations.superbird.config.system.build.btrfs' -j$(nproc) --show-trace
+  echo "rootfs is $(stat -Lc%s -- nix/result | numfmt --to=iec)"
 
 nixos-write-fs-to-disk:
   just nixos-build-fs
@@ -61,10 +62,18 @@ shrink-img:
   sudo losetup /dev/loop0 ./tmp/rootfs.img
   sudo mkdir -p /mnt/image
   sudo mount -o compress=zstd,noatime /dev/loop0 /mnt/image
+  sudo btrfs subvolume set-default 256 /mnt/image
 
-  for i in {0..6}
+  echo "defragmenting and compressing filesystem - this will take a while"
+  sudo btrfs filesystem defragment -r -czlib /mnt/image/root
+  sudo btrfs property set /mnt/image/root compression zstd
+
+  min_size=$(sudo btrfs filesystem usage -b /mnt/image | grep "Free (estimated)" | awk -F'min: ' '{print $2}' | awk '{gsub(/[()]/, ""); print $1 - 104857600}')
+  sudo btrfs filesystem resize "-$min_size" /mnt/image
+
+  for i in {0..5}
   do
-    min_size=$(sudo btrfs filesystem usage -b /mnt/image | grep "Free (estimated)" | awk -F'min: ' '{print $2}' | awk '{gsub(/[()]/, ""); print $1 - 1}')
+    min_size=$(sudo btrfs filesystem usage -b /mnt/image | grep "Free (estimated)" | awk -F'min: ' '{print $2}' | awk '{gsub(/[()]/, ""); print $1 - 1024}')
     sudo btrfs filesystem resize "-$min_size" /mnt/image
   done
 

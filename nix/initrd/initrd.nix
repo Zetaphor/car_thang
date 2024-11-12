@@ -73,6 +73,7 @@
           btrfs-progs
           iproute2
           iputils
+          vim
         ];
 
         users.root.shell = "/bin/bash";

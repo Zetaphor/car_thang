@@ -1,10 +1,12 @@
 {
   pkgs,
+  lib,
   config,
   ...
 }:
 let
   doom = "${pkgs.doomretro}/bin/doomretro -iwad /etc/games/DOOM.WAD";
+  cog = "${pkgs.cog}/bin/cog https://google.com/";
   firefox = "${pkgs.firefox}/bin/firefox";
   chromium = "${pkgs.ungoogled-chromium}/bin/chromium";
 
@@ -20,6 +22,8 @@ let
     exec ${
       if config.vars.doomEnabled == true then
         doom
+      else if config.vars.cogEnabled == true then
+        cog
       else if config.vars.firefoxEnabled == true then
         firefox
       else if config.vars.chromiumEnabled == true then
@@ -30,33 +34,35 @@ let
   ''}/bin/start-cage-app";
 in
 {
-  services.cage = {
-    enable = true;
-    user = "superbird";
-    program = "${app}";
-    extraArguments = [ "-d" ];
+  config = lib.mkIf config.vars.guiEnabled {
+    services.cage = {
+      enable = true;
+      user = "superbird";
+      program = "${app}";
+      extraArguments = [ "-d" ];
+    };
+
+    services.udev.packages = [
+      (pkgs.writeTextFile {
+        name = "touchscreen_udev";
+        text = ''
+          KERNEL=="event2", SUBSYSTEM=="input", ENV{LIBINPUT_CALIBRATION_MATRIX}="0 1 0 -1 0 1" ENV{WL_OUTPUT}="DSI-1"
+        '';
+        destination = "/etc/udev/rules.d/97-touchscreen.rules";
+      })
+    ];
+
+    # programs.sway.enable = true;
+
+    # services.greetd = {
+    #   enable = true;
+    #   settings = rec {
+    #     initial_session = {
+    #       command = "${session} ${doom}";
+    #       user = "superbird";
+    #     };
+    #     default_session = initial_session;
+    #   };
+    # };
   };
-
-  services.udev.packages = [
-    (pkgs.writeTextFile {
-      name = "touchscreen_udev";
-      text = ''
-        KERNEL=="event2", SUBSYSTEM=="input", ENV{LIBINPUT_CALIBRATION_MATRIX}="0 1 0 -1 0 1" ENV{WL_OUTPUT}="DSI-1"
-      '';
-      destination = "/etc/udev/rules.d/97-touchscreen.rules";
-    })
-  ];
-
-  # programs.sway.enable = true;
-
-  # services.greetd = {
-  #   enable = true;
-  #   settings = rec {
-  #     initial_session = {
-  #       command = "${session} ${doom}";
-  #       user = "superbird";
-  #     };
-  #     default_session = initial_session;
-  #   };
-  # };
 }

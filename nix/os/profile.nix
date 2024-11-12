@@ -12,6 +12,8 @@
 
   i18n.supportedLocales = [ (config.i18n.defaultLocale + "/UTF-8") ];
 
+  systemd.oomd.enable = true;
+
   nix = {
     settings = {
       experimental-features = "nix-command flakes";
